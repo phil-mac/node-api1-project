@@ -5,6 +5,8 @@ import './App.css';
 
 function App() {
   const [users, setUsers] = useState([]);
+  const [inputUser, setInputUser] = useState({});
+  const [editId, setEditId] = useState(-1);
 
   useEffect(() => {
     getUsers();
@@ -32,8 +34,13 @@ function App() {
     })
   }
 
-  const addUser = (id, user) => {
-    axios.delete(`http://localhost:8001/api/users/${id}`)
+  const handleInput = e => {
+    setInputUser({...inputUser, [e.target.name]: e.target.value})
+  }
+
+  const addUser = () => {
+    console.log(inputUser);
+    axios.post(`http://localhost:8001/api/users`, inputUser)
     .then(res => {
       console.log(res);
       getUsers();
@@ -41,6 +48,22 @@ function App() {
     .catch(err => {
       console.log(err);
     })
+  }
+
+  const editUser = () => {
+    console.log(inputUser);
+    axios.put(`http://localhost:8001/api/users/${editId}`, inputUser)
+    .then(res => {
+      console.log(res);
+      getUsers();
+    })
+    .catch(err => {
+      console.log(err);
+    })
+  }
+
+  const handleSetId = (e) => {
+    setEditId(e.target.value)
   }
 
   return (
@@ -55,14 +78,14 @@ function App() {
           </div>
         ))}
         Add or edit user:
-        <form style={{display: 'flex', flexDirection: 'column', width: '200px', background: 'grey'}}>
-          <input type='text' placeholder='name'/>
-          <input type='text' placeholder='bio'/>
-          <button>Add</button>
+        <div style={{display: 'flex', flexDirection: 'column', width: '200px', background: 'grey'}}>
+          <input type='text' name='name' placeholder='name' onChange={handleInput}/>
+          <input type='text' name='bio' placeholder='bio' onChange={handleInput}/>
+          <button onClick={addUser}>Add</button>
           <br/>
-          <input type='number' placeholder='user id (for editting only)'/>
-          <button>Update</button>
-        </form>
+          <input type='number' placeholder='user id (for editting only)' onChange={handleSetId}/>
+          <button onClick={editUser}>Update</button>
+        </div>
       </header>
     </div>
   );
